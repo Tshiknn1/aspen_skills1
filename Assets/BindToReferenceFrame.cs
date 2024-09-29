@@ -4,8 +4,9 @@ using UnityEngine;
 
 public class BindToReferenceFrame : MonoBehaviour
 {
-    GameObject currentlyBound = null;
-    Vector3 previousPosition;
+    private GameObject currentlyBound = null;
+    private Vector3 previousPosition;
+    private Vector3 momentum = Vector3.zero;
 
     // Start is called before the first frame update
     void Start()
@@ -19,8 +20,14 @@ public class BindToReferenceFrame : MonoBehaviour
         if (currentlyBound != null)
         {
             Vector3 newPosition = currentlyBound.transform.position;
-            transform.Translate(newPosition - previousPosition);
+            Vector3 delta = newPosition - previousPosition;
+            transform.Translate(delta);
             previousPosition = newPosition;
+            momentum = delta / Time.deltaTime;
+        }
+        else
+        {
+            transform.Translate(momentum * Time.deltaTime);
         }
     }
 
@@ -31,5 +38,10 @@ public class BindToReferenceFrame : MonoBehaviour
             currentlyBound = collision.gameObject;
             previousPosition = currentlyBound.transform.position;
         }
+    }
+
+    private void OnCollisionExit(Collision collision)
+    {
+        currentlyBound = null;
     }
 }
